@@ -105,16 +105,11 @@ def _get_uml_template(*, types: dict, type_mapping: dict, message_mapping: dict)
         type_template_text.write(f"""    {entry_index}[label = "{{{_type}|""")
         fields = []
         for _field in message.fields:
-            message_type = _field.message_type
-            field_type = type_mapping[_field.type]  # this will be 'message' if referencing another protobuf message
-
-            if message_type:
-                this_node = message_mapping[_type]
-                that_node = message_mapping[message_type.name]
-                relationships.append(f"    {this_node}->{that_node}")
-                field_type = message_type.name  # so we replace the 'message' token by the actual name
-
-            fields.append(f"+ {_field.name}:{field_type}")
+            nested_types = None
+            if hasattr(message, 'nested_types'):
+                nested_types = message.nested_types
+                print([ nested_types])
+            #_get_field_data(_field, _type, nested_types, fields, relationships, type_mapping, message_mapping)
 
         # add fields
         type_template_text.write("\\n".join(fields))
@@ -127,6 +122,23 @@ def _get_uml_template(*, types: dict, type_mapping: dict, message_mapping: dict)
     uml_template = uml_template.replace("CLASSES", "\n".join(classes))
     uml_template = uml_template.replace("RELATIONSHIPS", "\n".join(relationships))
     return uml_template
+
+
+def _get_field_data(field, _type, nested_types, fields, relationships, type_mapping, message_mapping):
+    message_type = field.message_type
+    field_type = type_mapping[field.type]  # this will be 'message' if referencing another protobuf message
+
+    if message_type:
+        this_node = message_mapping[_type]
+        that_node = message_mapping[message_type.name]
+        relationships.append(f"    {this_node}->{that_node}")
+        field_type = message_type.name  # so we replace the 'message' token by the actual name
+
+    fields.append(f"+ {field.name}:{field_type}")
+
+    if nested_types:
+        for nested_type in nested_types:
+            print(nested_type)
 
 
 @click.command()

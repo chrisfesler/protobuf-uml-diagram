@@ -104,12 +104,14 @@ def _get_uml_template(*, types: dict, type_mapping: dict, message_mapping: dict)
         type_template_text = StringIO()
         type_template_text.write(f"""    {entry_index}[label = "{{{_type}|""")
         fields = []
+        print(type_mapping)
+        if hasattr(message, 'nested_types'):
+            nested_types = message.nested_types
+            print([x.name for x in nested_types])
+            # _get_field_data(_field, _type, nested_types, fields, relationships, type_mapping, message_mapping)
+
         for _field in message.fields:
             nested_types = None
-            if hasattr(message, 'nested_types'):
-                nested_types = message.nested_types
-                print([ nested_types])
-            #_get_field_data(_field, _type, nested_types, fields, relationships, type_mapping, message_mapping)
 
         # add fields
         type_template_text.write("\\n".join(fields))

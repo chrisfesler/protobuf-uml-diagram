@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+enum FieldType {
+    TYPE_UNKNOWN = 0;
+    INTEGER = 1;
+    REAL_NUMBER = 2;
+    CATEGORICAL = 3;
+    DATE = 4;
+    TEXT = 5;
+}
+
+message FieldInfo {
+    string name = 1;
+    FieldType type = 2;
+    int32 empty_count = 4;
+    int32 count = 5;
+
+    message IntegerStats {
+        int64 min = 1;
+        int64 max = 2;
+        int64 mean = 3;
+        int64 median = 4;
+        repeated double percentile = 5;
+    }
+    message RealNumberStats {
+        double min = 1;
+        double max = 2;
+        double mean = 3;
+        double median = 4;
+        repeated double percentile = 5;
+
+        message Debug {
+            string message = 1;
+        }
+    }
+    message DateStats {
+        string min = 1;
+        string max = 2;
+        string mean = 3;
+        repeated string percentile = 5;
+    }
+    message CategoricalStats {
+        int32 unique = 1;
+        string most_frequent = 2;
+    }
+    oneof stats {
+        IntegerStats integer_stats = 100;
+        RealNumberStats real_number_stats = 101;
+        DateStats date_stats = 102;
+        CategoricalStats categorical_stats = 103;
+    }
+}
